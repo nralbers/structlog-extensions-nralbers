@@ -1,15 +1,17 @@
-# structlog-combined-log-parser
-Combined log parser processor class for use with structlog
+# structlog-extensions-nralbers
+Structlog processor classes for parsing various message formats into field-based formats.
+
+## CombinedLogParser
 
 If you have a logger that is passing apache combined log format strings in it's event field, you can use this processor 
 in your processor chain to convert the event string into fields.
 
-## Usage
+### Usage
 This is an example for configuring gunicorn to emit json logs.
 
 _gunicorn.conf.py_
 ```python
-from combined_log_parser.processors import CombinedLogParser
+from structlog_extensions.processors import CombinedLogParser
 import structlog
 
 # --- Structlog logging initialisation code

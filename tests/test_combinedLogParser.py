@@ -1,5 +1,5 @@
 from unittest import TestCase
-from combined_log_parser.processors import CombinedLogParser
+from structlog_extensions.processors import CombinedLogParser
 
 
 class TestCombinedLogParser(TestCase):
