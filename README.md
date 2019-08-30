@@ -15,14 +15,12 @@ from structlog_extensions.processors import CombinedLogParser
 import structlog
 
 # --- Structlog logging initialisation code
-timestamper = structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S")
 logparser = CombinedLogParser("gunicorn.access")
 pre_chain = [
     # Add the log level and a timestamp to the event_dict if the log entry
     # is not from structlog.
     structlog.stdlib.add_log_level,
     structlog.stdlib.add_logger_name,
-    timestamper,
     logparser.parse_combined_log
 ]
 

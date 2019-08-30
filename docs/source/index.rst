@@ -6,12 +6,11 @@
 Welcome to Structlog extensions's documentation!
 ================================================
 
-.. automodule:: structlog_extensions.processors
-    :members:
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
+   structlog_extensions
 
 
 

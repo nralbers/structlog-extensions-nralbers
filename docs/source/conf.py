@@ -22,7 +22,7 @@ copyright = '2019, Niels Albers'
 author = 'Niels Albers'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.3'
+release = '1.0.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -30,9 +30,14 @@ release = '0.0.3'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.coverage', 'sphinx.ext.napoleon'
+extensions = ['sphinx.ext.autodoc',
+              'sphinx.ext.coverage',
+              'sphinx.ext.napoleon',
+              'sphinx.ext.intersphinx'
 ]
 
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
+                       'structlog': ('http://www.structlog.org/en/stable/', None)}
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 

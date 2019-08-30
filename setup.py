@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='structlog-extensions-nralbers',
-    version='0.0.3',
+    version='1.0.0',
     packages=['tests', 'structlog_extensions'],
     url='https://github.com/nralbers/structlog-extensions-nralbers',
     license='MIT',
@@ -19,7 +19,7 @@ setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Topic :: System :: Logging"
     ],
 )

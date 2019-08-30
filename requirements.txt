@@ -1,0 +1,4 @@
+six==1.12.0
+structlog==19.1.0
+ua-parser==0.8.0
+user-agents==2.0
