@@ -1,21 +1,9 @@
-import re
-from user_agents import parse
+from .utils import convert_combined_log_to_ecs
 """
 structlog_extensions.processors 
 
 This module contains processors for structlog.
 """
-
-_ecs_field_mappings = {'host':'source.ip',
-                       'user': 'user.name',
-                       'event': 'event.original',
-                       'method': 'http.request.method',
-                       'referrer': 'http.request.referrer',
-                       'size': 'http.response.body.bytes',
-                       'status': 'http.response.status_code',
-                       'time': '@timestamp',
-                       'url': 'url.original',
-                       'version': 'http.version'}
 
 class CombinedLogParser:
     """
@@ -96,80 +84,12 @@ class CombinedLogParser:
         try:
             if logger and logger.name == self.target_logger:
                 original_event = event_dict['event']
-                result = self._parse_log(original_event)
-                request_fields = self._parse_request(result['request'])
-                result.update(request_fields)
-
-                user_agent_fields = self._parse_user_agent(result['agent'])
-                message = '"{0}" {1} {2}'.format(result['request'], result['status'], result['size'])
-                ecs_fields = self._convert_to_ecs(result)
-                ecs_fields.update(user_agent_fields)
-                ecs_fields['message'] = message
-                ecs_fields['event.original'] = original_event
+                ecs_fields = convert_combined_log_to_ecs(original_event)
                 event_dict.update(ecs_fields)
         finally:
             return event_dict
 
-    def _parse_log(self, message):
-        parts = [
-            r'(?P<host>\S+)',  # host %h
-            r'\S+',  # indent %l (unused)
-            r'(?P<user>\S+)',  # user %u
-            r'\[(?P<time>.+)\]',  # time %t
-            r'"(?P<request>.+)"',  # request "%r"
-            r'(?P<status>[0-9]+)',  # status %>s
-            r'(?P<size>\S+)',  # size %b (careful, can be '-')
-            r'"(?P<referrer>.*)"',  # referrer "%{Referrer}i"
-            r'"(?P<agent>.*)"',  # user agent "%{User-agent}i"
-        ]
-        pattern = re.compile(r'\s+'.join(parts) + r'\s*\Z')
-        match = pattern.match(message)
-        if match:
-            result = match.groupdict()
-            if result["user"] == "-":
-                result["user"] = None
-            result["status"] = int(result["status"])
-            if result["size"] == "-":
-                result["size"] = 0
-            else:
-                result["size"] = int(result["size"])
-            if result["referrer"] == "-":
-                result["referrer"] = None
-            return result
-        else:
-            return dict()
 
-    def _parse_request(self, request):
-        request_matcher = r'(?P<method>\S+)\s+(?P<url>\S+)\s+HTTP/(?P<version>\S+)'
-        pattern = re.compile(request_matcher)
-        match = pattern.match(request)
-        if match:
-            result = match.groupdict()
-            if 'method' in result:
-                result['method'] = result['method'].lower()
-            return result
-        else:
-            return dict()
-
-    def _parse_user_agent(self, agent_string):
-        user_agent = parse(agent_string)
-        result = dict()
-        result['user_agent.original'] = agent_string
-        result['user_agent.name'] = user_agent.browser.family
-        result['user_agent.os.name'] = user_agent.os.family
-        result['user_agent.os.version'] = user_agent.os.version_string
-        result['user_agent.os.full'] = ' '.join([user_agent.os.family,user_agent.os.version_string])
-        result['user_agent.device.name'] = user_agent.device.family
-        result['user_agent.version'] = user_agent.browser.version_string
-        return result
-
-    def _convert_to_ecs(self,parsed_fields):
-        result = dict()
-        parsed_fields.pop('request',None)
-        parsed_fields.pop('agent',None)
-        for key, value in parsed_fields.items():
-            result[_ecs_field_mappings[key]]=value
-        return result
 
 
 
