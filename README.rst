@@ -14,44 +14,43 @@ Usage
 -----
 This is an example for configuring gunicorn to emit json logs.
 
-    In *gunicorn.conf.py*
+.. code-block:: python
 
-    .. code-block::python
+    import structlog
+    import structlog_extensions
 
-        from structlog_extensions.processors import CombinedLogParser
-        import structlog
+    # --- Structlog logging initialisation code
 
-        # --- Structlog logging initialisation code
+    pre_chain = [
+        # Add the log level and a timestamp to the event_dict if the log entry
+        # is not from structlog.
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.add_logger_name,
+        structlog_extensions.processors.CombinedLogParser("gunicorn.access")
+    ]
 
-        pre_chain = [
-            # Add the log level and a timestamp to the event_dict if the log entry
-            # is not from structlog.
-            structlog.stdlib.add_log_level,
-            structlog.stdlib.add_logger_name,
-            CombinedLogParser("gunicorn.access")
-        ]
-
-        logconfig_dict = {
-            "version": 1,
-            "disable_existing_loggers": False,
-            "formatters": {
-                "json_formatter": {
-                    "()": structlog.stdlib.ProcessorFormatter,
-                    "processor": structlog.processors.JSONRenderer(),
-                    "foreign_pre_chain": pre_chain,
-                }
-            },
-            "handlers": {
-                "error_console": {
-                    "class": "logging.StreamHandler",
-                    "formatter": "json_formatter",
+    logconfig_dict = {
+                "version": 1,
+                "disable_existing_loggers": False,
+                "formatters": {
+                    "json_formatter": {
+                        "()": structlog.stdlib.ProcessorFormatter,
+                        "processor": structlog.processors.JSONRenderer(),
+                        "foreign_pre_chain": pre_chain,
+                    }
                 },
-                "console": {
-                    "class": "logging.StreamHandler",
-                    "formatter": "json_formatter",
-                }
-            },
-        }
+                "handlers": {
+                    "error_console": {
+                        "class": "logging.StreamHandler",
+                        "formatter": "json_formatter",
+                    },
+                    "console": {
+                        "class": "logging.StreamHandler",
+                        "formatter": "json_formatter",
+                    }
+                },
+            }
+
 
 ``ConvertNamespacedKeysToNestedDictJSONRenderer``
 =================================================
@@ -63,13 +62,15 @@ final processor in a chain because it renders the output as a string instead of 
 
 Example
 -------
- :code:`{ 'http.request.method': 'get', 'http:.request.referrer': 'http://www.example.com', 'http.version': '1.0'}`
-        becomes:
+An event dictionary with the following key/value pairs
+:code:`{ 'http.request.method': 'get', 'http:.request.referrer': 'http://www.example.com', 'http.version': '1.0'}`
 
-        .. code-block:: python
+will render into json as:
 
-            { 'http': { 'version': '1.0',
-                        'request': { 'method': 'get',
-                                     'referrer': 'http://www.example.com'}
-                        }
-            }
+.. code-block:: python
+
+    { 'http': { 'version': '1.0',
+                'request': { 'method': 'get',
+                             'referrer': 'http://www.example.com'}
+                }
+    }

@@ -6,11 +6,19 @@
 Welcome to Structlog extensions's documentation!
 ================================================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+.. include:: ../../README.rst
 
-   structlog_extensions
+.. toctree::
+   :maxdepth: 1
+   :caption: General
+
+   usage
+
+.. toctree::
+   :maxdepth: 1
+   :caption: API:
+
+   api
 
 
 

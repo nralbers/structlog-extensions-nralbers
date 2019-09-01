@@ -1,8 +1,6 @@
 from unittest import TestCase
-import logging
 import structlog
 import structlog_extensions
-from structlog_extensions.processors import ConvertNamespacedKeysToNestedDictJSONRenderer
 
 class TestNestedDictJSONRenderer(TestCase):
     def test_chain_processor(self):

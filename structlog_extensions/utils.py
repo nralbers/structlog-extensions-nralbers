@@ -18,6 +18,18 @@ _ecs_field_mappings = {'host':'source.ip',
 
 
 def convert_combined_log_to_ecs(log_line, dataset, severity=0):
+    """
+    Converts a combined log entry into a dict containing the log entry key/values
+    with the key names using Elastic Common schema element names.
+
+    Args:
+        log_line (str): Combined log entry
+        dataset (str): source of the log entry (for example 'apache.access')
+        severity (int, optional): severity of the source log event
+
+    Returns:
+        dict: Dictionary of key/value pairs with the key names using ECS namespaced names.
+    """
     result = _parse_log_into_fields(log_line)
     request_fields = _parse_request_section(result['request'])
     result.update(request_fields)
@@ -97,6 +109,16 @@ def _convert_field_names_to_ecs(parsed_fields):
     return ecs_fields
 
 def unflatten_dict(flat_dict, separator='.'):
+    """
+    Turns a dict with key names defining a namespace into a nested dictionary
+
+    Args:
+        flat_dict (dict): The dict cont
+        separator (str, optional): The separator used to split name elements. Default '.'
+
+    Returns:
+        dict: A nested dictionary structure created from the original flat dict.
+    """
     expanded_dict = dict()
     for key, value in flat_dict.items():
         field_hierarchy = key.split(separator)
@@ -107,7 +129,7 @@ def unflatten_dict(flat_dict, separator='.'):
     return expanded_dict
 
 
-def parse_datetime(timestamp):
+def _parse_datetime(timestamp):
     '''
     Parses datetime with timezone formatted as:
         `day/month/year:hour:minute:second zone`
@@ -125,6 +147,14 @@ def parse_datetime(timestamp):
 
 
 def combined_log_timestring_to_iso(timestamp):
-    dt = parse_datetime(timestamp)
+    """
+    converts a combined log format date/time entry into an iso standard datetime string
+    Args:
+        timestamp (str): Datetime log entry to convert
+
+    Returns:
+        str: iso standard datetime string
+    """
+    dt = _parse_datetime(timestamp)
     return dt.isoformat()
 

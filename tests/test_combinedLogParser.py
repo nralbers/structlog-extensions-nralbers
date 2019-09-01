@@ -1,7 +1,5 @@
 from unittest import TestCase
 import structlog_extensions
-from structlog_extensions.processors import CombinedLogParser
-import structlog_extensions.utils as utils
 import logging
 import sys
 import structlog
@@ -15,7 +13,7 @@ logging.basicConfig(
 
 class TestCombinedLogParser(TestCase):
     def setUp(self):
-        self.logparser = CombinedLogParser("gunicorn.access")
+        self.logparser = structlog_extensions.processors.CombinedLogParser("gunicorn.access")
         self.logger = logging.Logger("gunicorn.access")
         self.method_name = "warning"
         self.valid_event_dict = {
