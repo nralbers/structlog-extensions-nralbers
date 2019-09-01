@@ -1,9 +1,58 @@
-from .utils import convert_combined_log_to_ecs
 """
-structlog_extensions.processors 
+structlog_extensions.processors
 
 This module contains processors for structlog.
 """
+import structlog
+from .utils import convert_combined_log_to_ecs, unflatten_dict
+import logging
+
+
+class ConvertNamespacedKeysToNestedDictJSONRenderer(structlog.processors.JSONRenderer):
+    """
+    Structlog processor that turns namespaced keys in a log event into nested dictionaries and then outputs to JSON
+
+    Notes:
+        Must be the last processor on a chain, or the processor of a `structlog.stdlib.ProcessorFormatter` object
+
+    Example:
+        :code:`{ 'http.request.method': 'get', 'http:.request.referrer': 'http://www.example.com', 'http.version': '1.0'}`
+        becomes:
+
+        .. code-block:: python
+
+            { 'http': { 'version': '1.0',
+                        'request': { 'method': 'get',
+                                     'referrer': 'http://www.example.com'}
+                        }
+            }
+
+    Notes:
+        In cases where a root key has a value assigned and potential subkeys exist, the behaviour of this processor
+        could be difficult to predict since it uses a deep merge that will perform overwriting in the order the keys
+        are supplied by the event_dict. To prevent this happening, use the `clean_fields` attribute to specify the
+        conflicting keys that should be removed from the event_dict prior to expansion.
+
+    Attributes:
+        clean_keys (list): List of keys to remove from log event prior to expansion. Intended for use when the original
+                             log event has keys that might conflict with expanded keys.
+        separator (str, optional): Namespace separator. Default = '_'
+    """
+
+    def __init__(self, *args, clean_keys=None, separator='_', **kwargs):
+        self.clean_fields = clean_keys
+        self.separator = separator
+        super().__init__(*args, **kwargs)
+
+    def __call__(self, logger, name, event_dict):
+        if self.clean_fields:
+            for field in self.clean_fields:
+                event_dict.pop(field, None)
+        try:
+            nested_dict = unflatten_dict(event_dict, self.separator)
+        finally:
+            return super().__call__(logger,name,nested_dict)
+
 
 class CombinedLogParser:
     """
@@ -18,15 +67,15 @@ class CombinedLogParser:
 
         .. code-block:: python
 
-            from structlog_extensions.processors import CombinedLogParser
+            import structlog_extensions
             import structlog
             import logging
 
-            logparser = CombinedLogParser('access')
+
 
             structlog.configure(
                 processors=[
-                    logparser.parse_combined_log,
+                    structlog_extensions.processors.CombinedLogParser('gunicorn.access'),
                     structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
                 ],
                 logger_factory=structlog.stdlib.LoggerFactory(),
@@ -45,55 +94,24 @@ class CombinedLogParser:
             logger = structlog.get_logger("access")
             logger.warning(
                 '127.0.0.1 - frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326 "http://www.example.com/start.html" "Mozilla/4.08 [en] (Win98; I ;Nav)"')
-
-
-
-
     """
     def __init__(self, target_logger):
         self.target_logger = target_logger
 
-    def parse_combined_log(self, logger, method_name, event_dict):
-        """
-        Filter function to parse combined logs.
-
-        Add to the structlog processors list or the stdlib logger
-        foreign_pre_chain list to apply splitting of combined log entries to log entries.
-
-        Example:
-
-            .. code-block:: python
-
-                structlog.configure(
-                    processors=[
-                        logparser.parse_combined_log,  # pass function as a list item. NOTE! no ()
-                        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-                    ],
-                    logger_factory=structlog.stdlib.LoggerFactory(),
-                )
-
-        Args:
-            logger(logging.Logger): Logger object passed by the processor chain
-            method_name(str): Name of the method called on the logger to log the message
-            event_dict(dict): The event dict containing the log context
-
-        Returns:
-            dict: structlog event_dict with combined log fields added and renamed according to the elastic common schema.
-
-        """
+    def __call__(self, logger, method_name, event_dict):
         try:
             if logger and logger.name == self.target_logger:
+                if method_name in ['info', 'warn', 'warning', 'error', 'critical', 'debug']:
+                    severity = getattr(logging, method_name.upper())
+                else:
+                    severity = 0
                 original_event = event_dict['event']
-                ecs_fields = convert_combined_log_to_ecs(original_event)
+                ecs_fields = convert_combined_log_to_ecs(log_line=original_event, dataset=logger.name,
+                                                         severity=severity)
                 event_dict.update(ecs_fields)
+
         finally:
             return event_dict
-
-
-
-
-
-
 
 
 
