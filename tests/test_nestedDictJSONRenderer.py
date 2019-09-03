@@ -6,7 +6,7 @@ class TestNestedDictJSONRenderer(TestCase):
     def test_chain_processor(self):
         structlog.configure(
             processors=[
-                structlog_extensions.processors.ConvertNamespacedKeysToNestedDictJSONRenderer(clean_keys=['event'], separator='_'),
+                structlog_extensions.processors.NestedDictJSONRenderer(clean_keys=['event'], separator='_'),
             ],
             context_class=dict,
             logger_factory=structlog.stdlib.LoggerFactory(),

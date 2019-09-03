@@ -8,7 +8,7 @@ API Reference
 
 .. autoclass:: CombinedLogParser
 
-.. autoclass:: ConvertNamespacedKeysToNestedDictJSONRenderer
+.. autoclass:: NestedDictJSONRenderer
 
 :mod:`utils` Module
 -------------------

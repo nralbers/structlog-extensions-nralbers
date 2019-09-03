@@ -8,16 +8,61 @@ from .utils import convert_combined_log_to_ecs, unflatten_dict
 import logging
 
 
-class ConvertNamespacedKeysToNestedDictJSONRenderer(structlog.processors.JSONRenderer):
+class NestedDictJSONRenderer(structlog.processors.JSONRenderer):
     """
-    Structlog processor that turns namespaced keys in a log event into nested dictionaries and then outputs to JSON
+    Structlog processor for creating JSON output including nested key output. It assumes that any key name
+    using the specified separator is actually multiple nested keys, and will transform the log event dictionary to
+    reflect this. The primary use case is for turning
+    'flat' key-value pairs into the sort of structured json seen in (for example) elastic common schema.
 
     Notes:
-        Must be the last processor on a chain, or the processor of a `structlog.stdlib.ProcessorFormatter` object
+        Must be the last processor on a chain (when using structlog as a renderer),
+        or the processor of a py:class:`structlog::structlog.stdlib.ProcessorFormatter` object when using logging as a renderer.
 
     Example:
-        :code:`{ 'http.request.method': 'get', 'http:.request.referrer': 'http://www.example.com', 'http.version': '1.0'}`
-        becomes:
+        When using this logging initialisation:
+
+        .. code-block:: python
+
+            # --- std logging initialisation code using structlog rendering
+
+            pre_chain = [
+                # Add the log level and a timestamp to the event_dict if the log entry
+                # is not from structlog.
+                structlog.stdlib.add_log_level,
+                structlog.stdlib.add_logger_name,
+                structlog_extensions.processors.CombinedLogParser("gunicorn.access")
+            ]
+
+            logging.dict_config( {
+                        "version": 1,
+                        "disable_existing_loggers": False,
+                        "formatters": {
+                            "json_formatter": {
+                                "()": structlog.stdlib.ProcessorFormatter,
+                                "processor": structlog_extensions.processors.NestedDictJSONRenderer('.'),
+                                "foreign_pre_chain": pre_chain,
+                            }
+                        },
+                        "handlers": {
+                            "error_console": {
+                                "class": "logging.StreamHandler",
+                                "formatter": "json_formatter",
+                            },
+                            "console": {
+                                "class": "logging.StreamHandler",
+                                "formatter": "json_formatter",
+                            }
+                        },
+                    })
+
+        These entries (produced by py:class:`structlog_extensions.processors.CombinedLogParser`)`:
+
+        .. code-block:: python
+
+            { 'http.request.method': 'get', 'http:.request.referrer': 'http://www.example.com', 'http.version': '1.0'}`
+
+        will be transformed into the following nested json structure:
 
         .. code-block:: python
 
@@ -34,9 +79,9 @@ class ConvertNamespacedKeysToNestedDictJSONRenderer(structlog.processors.JSONRen
         conflicting keys that should be removed from the event_dict prior to expansion.
 
     Attributes:
-        clean_keys (list): List of keys to remove from log event prior to expansion. Intended for use when the original
-                             log event has keys that might conflict with expanded keys.
         separator (str, optional): Namespace separator. Default = '_'
+        clean_keys (list, optional): List of keys to remove from log event prior to expansion. Intended for use when the original
+                             log event has key names that might overlap with the root names of nested keys.
     """
 
     def __init__(self, *args, clean_keys=None, separator='_', **kwargs):

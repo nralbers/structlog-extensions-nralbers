@@ -52,7 +52,7 @@ This is an example for configuring gunicorn to emit json logs.
             }
 
 
-``ConvertNamespacedKeysToNestedDictJSONRenderer``
+``NestedDictJSONRenderer``
 =================================================
 
 This processor will convert key names using a specified separator into nested dictionaries prior to rendering the
