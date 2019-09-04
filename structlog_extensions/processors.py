@@ -17,7 +17,7 @@ class NestedDictJSONRenderer(structlog.processors.JSONRenderer):
 
     Notes:
         Must be the last processor on a chain (when using structlog as a renderer),
-        or the processor of a py:class:`structlog::structlog.stdlib.ProcessorFormatter` object when using logging as a renderer.
+        or the processor of a ``structlog.stdlib.ProcessorFormatter`` object when using logging as a renderer.
 
     Example:
         When using this logging initialisation:
@@ -56,7 +56,7 @@ class NestedDictJSONRenderer(structlog.processors.JSONRenderer):
                         },
                     })
 
-        These entries (produced by py:class:`structlog_extensions.processors.CombinedLogParser`)`:
+        These entries (produced by ``structlog_extensions.processors.CombinedLogParser``):
 
         .. code-block:: python
 

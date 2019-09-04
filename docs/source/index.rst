@@ -3,20 +3,27 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Structlog extensions's documentation!
+================================================
+Structlog Extensions
 ================================================
 
 .. include:: ../../README.rst
+   :start-after: -begin-short-
+   :end-before: -end-short-
+
+User guide
+==========
 
 .. toctree::
-   :maxdepth: 1
-   :caption: General
+   :maxdepth: 2
 
    usage
 
+API Reference
+=============
+
 .. toctree::
-   :maxdepth: 1
-   :caption: API:
+   :maxdepth: 3
 
    api
 
