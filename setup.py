@@ -7,8 +7,8 @@ with open("README.rst", "r") as fh:
 
 setup(
     name='structlog-extensions-nralbers',
-    version='1.0.1',
-    packages=['tests', 'structlog_extensions'],
+    version='1.0.2',
+    packages=['structlog_extensions'],
     url='https://structlog-extensions-nralbers.readthedocs.io/en/latest/',
     project_urls={
         'Documentation': 'https://structlog-extensions-nralbers.readthedocs.io/en/latest/',
