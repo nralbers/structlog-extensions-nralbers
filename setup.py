@@ -1,13 +1,13 @@
 from setuptools import setup
 
-KEYWORDS = ["logging", "structured", "structure", "log","ecs","apache-combined-log"]
+KEYWORDS = ["logging", "structured", "structure", "log", "ecs", "apache-combined-log"]
 
 with open("README.rst", "r") as fh:
     long_description = fh.read()
 
 setup(
     name='structlog-extensions-nralbers',
-    version='1.0.2',
+    version='1.0.3',
     packages=['structlog_extensions'],
     url='https://structlog-extensions-nralbers.readthedocs.io/en/latest/',
     project_urls={
