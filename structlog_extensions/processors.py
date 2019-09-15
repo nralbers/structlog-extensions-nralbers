@@ -145,16 +145,20 @@ class CombinedLogParser:
 
     def __call__(self, logger, method_name, event_dict):
         try:
-            if logger and logger.name == self.target_logger:
+            record = event_dict.get("_record")
+            if record is None:
+                logger_name = logger.name
+            else:
+                logger_name = record.name
+            if logger_name == self.target_logger:
                 if method_name in ['info', 'warn', 'warning', 'error', 'critical', 'debug']:
                     severity = getattr(logging, method_name.upper())
                 else:
                     severity = 0
                 original_event = event_dict['event']
-                ecs_fields = convert_combined_log_to_ecs(log_line=original_event, dataset=logger.name,
+                ecs_fields = convert_combined_log_to_ecs(log_line=original_event, dataset=logger_name,
                                                          severity=severity)
                 event_dict.update(ecs_fields)
-
         finally:
             return event_dict
 
