@@ -7,7 +7,7 @@ with open("README.rst", "r") as fh:
 
 setup(
     name='structlog-extensions-nralbers',
-    version='1.0.3',
+    version='1.0.4',
     packages=['structlog_extensions'],
     url='https://structlog-extensions-nralbers.readthedocs.io/en/latest/',
     project_urls={
@@ -19,7 +19,7 @@ setup(
     author='Niels Albers',
     author_email='nralbers@gmail.com',
     description='Processors for Structlog library',
-    install_requires=['structlog','user-agents','deepmerge', 'pytz'],
+    install_requires=['structlog>=19.2','user-agents','deepmerge', 'pytz'],
     keywords=KEYWORDS,
     long_description=long_description,
     long_description_content_type="text/x-rst",
@@ -27,9 +27,9 @@ setup(
     classifiers=[
         "Natural Language :: English",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "License :: OSI Approved :: MIT License",

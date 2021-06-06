@@ -2,6 +2,7 @@ from unittest import TestCase
 import structlog
 import structlog_extensions
 
+
 class TestNestedDictJSONRenderer(TestCase):
     def test_chain_processor(self):
         structlog.configure(
