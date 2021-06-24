@@ -1,3 +1,6 @@
+
+.. image:: https://img.shields.io/github/license/nralbers/structlog-extensions-nralbers   :alt: GitHub license   :target: https://github.com/nralbers/structlog-extensions-nralbers/blob/master/LICENSE
+
 ==========================================================================
 ``structlog-extensions-nralbers``:  Extension processors for ``structlog``
 ==========================================================================
