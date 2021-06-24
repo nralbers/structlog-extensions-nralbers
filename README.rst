@@ -1,3 +1,16 @@
+.. raw:: html
+
+   <p align=center>
+     <a href="https://github.com/nralbers/structlog-extensions-nralbers/blob/master/LICENSE">
+       <img alt="GitHub license" src="https://img.shields.io/github/license/nralbers/structlog-extensions-nralbers">
+     </a>
+     <a href="https://github.com/nralbers/structlog-extensions-nralbers/issues">
+       <img alt="GitHub issues" src="https://img.shields.io/github/issues/nralbers/structlog-extensions-nralbers">
+     </a>
+     <a href="https://github.com/nralbers/structlog-extensions-nralbers/stargazers">
+       <img alt="GitHub stars" src="https://img.shields.io/github/stars/nralbers/structlog-extensions-nralbers">
+     </a>
+   </p>
 
 ==========================================================================
 ``structlog-extensions-nralbers``:  Extension processors for ``structlog``
