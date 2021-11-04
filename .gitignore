@@ -65,6 +65,8 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/build/
+docs/source/_build/
 
 # PyBuilder
 target/
@@ -105,3 +107,7 @@ venv.bak/
 
 # pycharm project files
 .idea
+
+# VSCode settings
+.vscode
+
